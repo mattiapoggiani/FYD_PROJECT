@@ -14,8 +14,8 @@ include(${QT_USE_FILE})
 find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
-find_package(Eigen REQUIRED Dense Geometry)
-include_directories( ${Eigen_INCLUDE_DIRS} )
+#find_package(Eigen REQUIRED Dense Geometry)
+#include_directories( ${Eigen_INCLUDE_DIRS} )
 
 execute_process(COMMAND tar -xf ../FRILibrary.tar.gz)
 execute_process(COMMAND make -C FRILibrary/Linux)
