@@ -1,0 +1,4 @@
+#	g++ FYD_Client.cpp wireless_communicator.cpp conio.c -o FYD_Client -I/usr/local/include/opencv -L/usr/local/lib/ -lopencv_core -lopencv_highgui
+g++ FYD_Client.cpp accelerometers.cpp wireless_communicator.cpp functions.cpp conio.cpp -o FYD_Client -I/usr/include/opencv2/highgui -L/usr/lib/ -lopencv_core -lopencv_highgui -lHDU -lHD -lrt -lncurses -lpthread -lphidget21
+
+echo 'Client Compiled';
