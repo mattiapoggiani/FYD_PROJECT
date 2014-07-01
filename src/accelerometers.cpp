@@ -28,9 +28,9 @@ int CCONV SpatialDataHandler(CPhidgetSpatialHandle spatial, void *userptr, CPhid
     new_count = count;
     for(int i = 0; i < count; i++)
     {
-        raw_acc[i][0] = ((int)data[i]->acceleration[0]*100)/100.0;
-        raw_acc[i][1] = ((int)data[i]->acceleration[1]*100)/100.0;
-        raw_acc[i][2] = ((int)data[i]->acceleration[2]*100)/100.0;
+        raw_acc[i][0] = ((int)data[i]->acceleration[0]); //*100)/100.0;
+        raw_acc[i][1] = ((int)data[i]->acceleration[1]); //*100)/100.0;
+        raw_acc[i][2] = ((int)data[i]->acceleration[2]); //*100)/100.0;
 
         unsigned long int time_us = data[i]->timestamp.seconds*1000000+data[i]->timestamp.microseconds;
 

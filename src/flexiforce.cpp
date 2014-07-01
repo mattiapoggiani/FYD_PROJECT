@@ -16,12 +16,13 @@ int read_flexiforce()
     return 0;
 }
 
-void init_flexiforce(){
+bool init_flexiforce(){
         fd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY | O_NONBLOCK);
 
         if(fd == -1) // if open is unsucessful
         {
             printf("open_port: Unable to open /dev/ttyACM0. \n");
+            return false;
         }
         else
         {
@@ -40,6 +41,7 @@ void init_flexiforce(){
         port_settings.c_cflag |= CS8;
 
         tcsetattr(fd, TCSANOW, &port_settings);    // apply the settings to the port
+        return true;
 }
 
 void close_flexiforce(){

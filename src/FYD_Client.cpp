@@ -174,61 +174,66 @@ float get_material_stiffness(){
     double stiffness[10];
     double force_flexi = 0.0;
 
-    // FLEXIFORCE INITIALIZATION
-    init_flexiforce();
-
-    Robot->GetMeasuredCartPose (MeasuredPose);
-
-    while (count<10 && indent<10){
-
-        inc -= 0.001;
-
-        gotoworld(0, 3) = 0;
-        gotoworld(1, 3) = 0;
-        gotoworld(2, 3) = inc + 0.001*z0;
-        gotRobot.block<3,1>(0,3) = (WorldRobotef.block<3,3>(0,0)).inverse()*gotoworld.block<3,1>(0,3);
-        NewRobotef = WorldRobotBaseI*(WorldRobotef*gotRobot);
-
-        int index_matrix = 0;
-        for (int i = 0; i < 3; i++){
-            for (int j = 0; j < 4; j++){
-                CommandedPose[index_matrix] = NewRobotef(i,j);
-                index_matrix++;
-            }
-        }
-        Robot->SetCommandedCartPose( CommandedPose );
-        usleep(500000);
-
-        get_current_force(&force_flexi);
-
-        if (force_flexi > 0.1){
-            // It is a valid measure
-            if (count == 0){
-                indent0 = inc;
-            }
-            indent = fabs(inc) - fabs(indent0);
-
-            stiffness[count] = force_flexi / (indent*1000);
-            count++;
-        }
-       cout << "INC: " << inc << " - INDENT: " << indent << "INDENT0: " << indent0 << " COUNT: " << count << endl;
-//        cout << "FORCE: " << force_flexi << endl;
-//        cout << "STIFFNESS: " << stiffness[count-1] << endl << endl;
-    }
-
-    // Average stiffness samples
     double stiff = 0;
-    for (int i=1; i<count; i++){
-        stiff += stiffness[i];
+
+    // FLEXIFORCE INITIALIZATION
+    if (init_flexiforce()){
+
+        Robot->GetMeasuredCartPose (MeasuredPose);
+
+        while (count<10){ // && indent<10){
+
+            inc -= 0.001;
+
+            gotoworld(0, 3) = 0;
+            gotoworld(1, 3) = 0;
+            gotoworld(2, 3) = inc + 0.001*z0;
+            gotRobot.block<3,1>(0,3) = (WorldRobotef.block<3,3>(0,0)).inverse()*gotoworld.block<3,1>(0,3);
+            NewRobotef = WorldRobotBaseI*(WorldRobotef*gotRobot);
+
+            int index_matrix = 0;
+            for (int i = 0; i < 3; i++){
+                for (int j = 0; j < 4; j++){
+                    CommandedPose[index_matrix] = NewRobotef(i,j);
+                    index_matrix++;
+                }
+            }
+            Robot->SetCommandedCartPose( CommandedPose );
+            usleep(500000);
+
+            get_current_force(&force_flexi);
+
+            if (force_flexi > 0.1){
+                // It is a valid measure
+                if (count == 0){
+                    indent0 = inc;
+                }
+                indent = fabs(inc) - fabs(indent0);
+
+                stiffness[count] = force_flexi / (indent*1000);
+                count++;
+            }
+           cout << "INC: " << inc << " - INDENT: " << indent << "INDENT0: " << indent0 << " COUNT: " << count << endl;
+    //        cout << "FORCE: " << force_flexi << endl;
+    //        cout << "STIFFNESS: " << stiffness[count-1] << endl << endl;
+        }
+
+        // Average stiffness samples
+        for (int i=1; i<count; i++){
+            stiff += stiffness[i];
+        }
+        stiff /= count;
+
+
+        // Close flexiforce
+        close_flexiforce();
+
+        // Get starting position
+        Robot->SetCommandedCartPose( MeasuredPose );
     }
-    stiff /= count;
-
-
-    // Close flexiforce
-    close_flexiforce();
-
-    // Get starting position
-    Robot->SetCommandedCartPose( MeasuredPose );
+    else {
+        stiff = 0;
+    }
 
     return stiff;
 }
@@ -703,36 +708,5 @@ int phantom_close(){
     return 0;
 }
 
-
-
-
-//    if (first_run) {
-//        first_run = false;
-//        hduVecSet(Poffset, Pposition[0], Pposition[1], Pposition[2]);
-//        hdEndFrame(hHD);
-//        return HD_CALLBACK_CONTINUE;
-//    }
-
-
-//    if (!reset_flag){
-        // Change of coordinates because of differen frame definitions
-        // Phantom frame: X (right), Y(up), Z(front)
-        // F.Y.D. frame: X (right), Y(back), Z(up)
-//        hduVecSet(finger_position, finger[0], finger[2], finger[1]);
-//    }
-//    else {
-//        finger_position[0] = -PHANTOM0_POS;
-//        finger_position[2] =  PHANTOM2_POS;
-//    }
-
-
-
-         // Set begin_program flag to start communication with F.Y.D. device
-//         if (!begin_program) begin_program = true;
-
-//         reset_flag = false;
-
-
-//}
 
 /*****************************************************************************/

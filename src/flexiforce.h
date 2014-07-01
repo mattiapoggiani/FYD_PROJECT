@@ -6,15 +6,15 @@
 #include <unistd.h> // UNIX standard function definitions
 #include <fcntl.h> // File control definitions
 #include <errno.h> // Error number definitions
-#include <termios.h> // POSIX terminal control definitionss
+#include <termios.h> // POSIX terminal control definitions
 #include <time.h>   // time calls
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FF_SF2  -0.0014
-#define FF_SF    2.1661
-#define FF_OFF  -292.6009
+#define FF_SF2    0.0010      //-0.0014
+#define FF_SF     0.1382     //2.1661
+#define FF_OFF  -154.6296   //-292.6009
 #define ACC_G      9.79         // m/(s^2)
 
 #define NEED_FILE 0
@@ -27,7 +27,7 @@ static int fd; // file description for the serial port
 static int bytes;
 static char buffer[5];
 
-void init_flexiforce();
+bool init_flexiforce();
 void close_flexiforce();
 void get_current_force(double*);
 int read_flexiforce();
