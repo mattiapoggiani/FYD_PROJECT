@@ -26,11 +26,24 @@ void init_accelerometers(CPhidgetSpatialHandle* spatial){
 int CCONV SpatialDataHandler(CPhidgetSpatialHandle spatial, void *userptr, CPhidgetSpatial_SpatialEventDataHandle *data, int count)
 {
     new_count = count;
+    double sub;
+    double raw_old[3];
     for(int i = 0; i < count; i++)
     {
-        raw_acc[i][0] = ((int)data[i]->acceleration[0]); //*100)/100.0;
-        raw_acc[i][1] = ((int)data[i]->acceleration[1]); //*100)/100.0;
-        raw_acc[i][2] = ((int)data[i]->acceleration[2]); //*100)/100.0;
+        for (int j = 0; j < 3; j++){
+            raw_acc[i][j] = data[i]->acceleration[j];
+            raw_acc[i][j] = (int(raw_acc[i][j]*10.0))/10.0;
+/*
+            if (j==0)
+                sub = 1.0;
+            else
+                sub = 0.0;
+
+            if (fabs(raw_acc[i][j] - sub) <= 0.2) // && raw_old[j] == 0.0)
+                raw_acc[i][j] = sub;
+
+            raw_old[j] = raw_acc[i][j];
+*/        }
 
         unsigned long int time_us = data[i]->timestamp.seconds*1000000+data[i]->timestamp.microseconds;
 

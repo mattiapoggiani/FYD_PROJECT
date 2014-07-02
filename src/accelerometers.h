@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <phidget21.h>
+#include <math.h>
 
 #define DATARATE_MS 1	            // 1000 Hz
 #define MAX_SENSOR_ACC_G 5	    // (-5g, +5g)

@@ -10,7 +10,7 @@ char buf[MAXDATASIZE];
 
 /********* APPLICATION GLOBAL VARIABLES **********/
 CPhidgetSpatialHandle accel = 0;
-short int rest_acc[3];
+short int rest_acc[3] = {0,0,0};
 short int acc[3] = {0,0,0};
 short int ref[2] = {0,0};
 char imbuf[IMAGESIZE];
@@ -181,7 +181,7 @@ float get_material_stiffness(){
 
         Robot->GetMeasuredCartPose (MeasuredPose);
 
-        while (count<10){ // && indent<10){
+        while (count<10 && indent<10){
 
             inc -= 0.001;
 
@@ -311,7 +311,9 @@ void* packets_loop(void* data){
 //            cout << "POSITION - X: "  << finger[0] << " Y - " << finger[1] << endl;
 //            cout << "INDENTATION: " << finger[2] << endl;
 //            cout << "FORCE: " << force_loadcell << endl << endl;
-cout << "FINGER - x: " << finger[0] << ", y: " << finger[1] << ", z: " << finger[2] << endl;
+//cout << "FINGER - x: " << finger[0] << ", y: " << finger[1] << ", z: " << finger[2] << endl;
+            printf("ACC: %i; %i; %i\n", acc[0], acc[1], acc[2]);
+
             // Other Requests
             if (recv_info){
                 if(receive_info(QB_info, &k_vib, ref)){
@@ -355,12 +357,6 @@ void* kuka_thread(void* data){
 
     while (1)   //((float)CycleCounter * Robot->GetCycleTime() < RUN_TIME_IN_SECONDS)
     {
-
-        // Set rest acceleration before starting vibration
-        if (first_run_acc){
-            get_current_acceleration(rest_acc);
-            first_run_acc = false;
-        }
 
         Robot->WaitForKRCTick();
 
@@ -603,7 +599,7 @@ int phantom_init(int mode, const char* ip_host, double z0_var){
         fprintf(stdout, "Performing Cartesian impedance control.\n");
 
         cout << "Getting stiffness information ...";
-        stiffness = get_material_stiffness(); //0.7; //1.0;
+        stiffness = 0.6; //get_material_stiffness(); //0.7; //1.0;
         cout << "done." << endl;
 
         cout << "STIFFNESS: " << stiffness << endl << endl;
@@ -652,6 +648,12 @@ int phantom_init(int mode, const char* ip_host, double z0_var){
 /****************** CREATE ACCELEROMETERS VARIABLES ******************/
 	init_accelerometers(&accel);
     CPhidgetSpatial_setDataRate(accel, DATARATE_MS);
+
+    // Set rest acceleration before starting vibration
+    if (first_run_acc){
+        get_current_acceleration(rest_acc);
+        first_run_acc = false;
+    }
 
 /*********************** START PHANTOM PROCESS **************************/
     ph_file = fopen(PHANTOM_FILE_PATH, "w");

@@ -22,7 +22,7 @@
 //#include "/usr/include/opencv2/highgui/highgui.hpp"
 
 #define ENABLE_NETWORK
-#define KUKA
+//#define KUKA
 //#define SHOW_IMAGE
 
 #define G_COMP_X  0         //0
