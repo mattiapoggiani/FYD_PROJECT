@@ -212,8 +212,9 @@ float get_material_stiffness(){
 
                 stiffness[count] = force_flexi / (indent*1000);
                 count++;
+                cout << "Measure " << count << " : " << indent << " - Force (N) : " << force_flexi << endl;
             }
-           cout << "INC: " << inc << " - INDENT: " << indent << "INDENT0: " << indent0 << " COUNT: " << count << endl;
+
     //        cout << "FORCE: " << force_flexi << endl;
     //        cout << "STIFFNESS: " << stiffness[count-1] << endl << endl;
         }
@@ -235,7 +236,7 @@ float get_material_stiffness(){
         stiff = 0;
     }
 
-    return stiff;
+    return stiff + 0.4;       // 0.4 added due to new flexiforce sensor
 }
 
 
@@ -311,8 +312,8 @@ void* packets_loop(void* data){
 //            cout << "POSITION - X: "  << finger[0] << " Y - " << finger[1] << endl;
 //            cout << "INDENTATION: " << finger[2] << endl;
 //            cout << "FORCE: " << force_loadcell << endl << endl;
-//cout << "FINGER - x: " << finger[0] << ", y: " << finger[1] << ", z: " << finger[2] << endl;
-            printf("ACC: %i; %i; %i\n", acc[0], acc[1], acc[2]);
+cout << "FINGER - x: " << finger[0] << ", y: " << finger[1] << ", z: " << finger[2] << endl;
+//            printf("ACC: %i; %i; %i\n", acc[0], acc[1], acc[2]);
 
             // Other Requests
             if (recv_info){
@@ -599,7 +600,7 @@ int phantom_init(int mode, const char* ip_host, double z0_var){
         fprintf(stdout, "Performing Cartesian impedance control.\n");
 
         cout << "Getting stiffness information ...";
-        stiffness = 0.6; //get_material_stiffness(); //0.7; //1.0;
+        stiffness = get_material_stiffness(); //0.7; //1.0;
         cout << "done." << endl;
 
         cout << "STIFFNESS: " << stiffness << endl << endl;

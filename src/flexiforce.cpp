@@ -7,8 +7,10 @@ int read_flexiforce()
 
 //    printf("read is %s\n", buffer);
 
-    flexiforce_val = atoi(buffer);
-    if (flexiforce_val < 0)
+    int vv = atoi(buffer); // -200;
+    flexiforce_val = (vv>0)?vv:0;
+//    printf("F:%u\n", flexiforce_val);
+    if (flexiforce_val < 100)
            flexiforce_val = 0;
 
     if (NEED_FILE)
@@ -27,7 +29,7 @@ bool init_flexiforce(){
         else
         {
             fcntl(fd, F_SETFL, 0);
-            printf("port is open.\n");
+        //    printf("port is open.\n");
         }
 
         struct termios port_settings;      // structure to store the port settings in
