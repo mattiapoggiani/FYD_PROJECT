@@ -9,9 +9,6 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/time.h>
-//#include <HD/hd.h>
-//#include <HDU/hduError.h>
-//#include <HDU/hduVector.h>
 #include <QMainWindow>
 
 /*** APPLICATION INCLUDES & DEFINES ***/

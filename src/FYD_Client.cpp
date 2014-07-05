@@ -312,7 +312,7 @@ void* packets_loop(void* data){
 //            cout << "POSITION - X: "  << finger[0] << " Y - " << finger[1] << endl;
 //            cout << "INDENTATION: " << finger[2] << endl;
 //            cout << "FORCE: " << force_loadcell << endl << endl;
-cout << "FINGER - x: " << finger[0] << ", y: " << finger[1] << ", z: " << finger[2] << endl;
+//cout << "FINGER - x: " << finger[0] << ", y: " << finger[1] << ", z: " << finger[2] << endl;
 //            printf("ACC: %i; %i; %i\n", acc[0], acc[1], acc[2]);
 
             // Other Requests
@@ -600,7 +600,7 @@ int phantom_init(int mode, const char* ip_host, double z0_var){
         fprintf(stdout, "Performing Cartesian impedance control.\n");
 
         cout << "Getting stiffness information ...";
-        stiffness = get_material_stiffness(); //0.7; //1.0;
+        stiffness = 1.0; //get_material_stiffness(); //0.7; //1.0;
         cout << "done." << endl;
 
         cout << "STIFFNESS: " << stiffness << endl << endl;
