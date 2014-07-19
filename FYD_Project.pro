@@ -20,7 +20,8 @@ SOURCES +=\
     src/conio.cpp \
     src/accelerometers.cpp \
     src/main.cpp \
-    src/flexiforce.cpp
+    src/flexiforce.cpp \
+    src/loadcell.cpp
 
 
 
@@ -31,7 +32,8 @@ HEADERS  += mainwindow.h \
     src/conio.h \
     src/accelerometers.h \
     src/globals.h \
-    src/flexiforce.h
+    src/flexiforce.h \
+    src/loadcell.h
 
 FORMS    += mainwindow.ui
 

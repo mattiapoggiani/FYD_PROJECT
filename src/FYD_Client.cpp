@@ -83,6 +83,11 @@ double stiffness;
 double z0;
 float indent0 = 0.0;
 
+// LOAD CELL VARIABLES
+CPhidgetBridgeHandle bridge;
+double force;
+
+
 timeval now, last;
 double dt;
 QString console_info_str;
@@ -166,7 +171,7 @@ Matrix4f ROTY(float angle){
     return Mat;
 }
 
-float get_material_stiffness(){
+float get_flexi_stiffness(){
     // Move KUKA downwards until 10 stiffness samples are in memory
     int count = 0;
     float indent = 0.0;
@@ -201,7 +206,7 @@ float get_material_stiffness(){
             Robot->SetCommandedCartPose( CommandedPose );
             usleep(500000);
 
-            get_current_force(&force_flexi);
+            get_flexi_force(&force_flexi);
 
             if (force_flexi > 0.1){
                 // It is a valid measure
@@ -238,6 +243,81 @@ float get_material_stiffness(){
 
     return stiff + 0.4;       // 0.4 added due to new flexiforce sensor
 }
+
+float get_material_stiffness(){
+    // Move KUKA downwards until 10 stiffness samples are in memory
+    int count = 0;
+    float indent = 0.0;
+    float inc = 0.0;
+    double stiffness[10];
+    double stiff = 0;
+
+    init_loadcell(&bridge);
+
+    // FLEXIFORCE INITIALIZATION
+    if (1){
+
+        Robot->GetMeasuredCartPose (MeasuredPose);
+
+        while (count<10 && indent<10){
+
+            inc -= 0.001;
+
+            gotoworld(0, 3) = 0;
+            gotoworld(1, 3) = 0;
+            gotoworld(2, 3) = inc + 0.001*z0;
+            gotRobot.block<3,1>(0,3) = (WorldRobotef.block<3,3>(0,0)).inverse()*gotoworld.block<3,1>(0,3);
+            NewRobotef = WorldRobotBaseI*(WorldRobotef*gotRobot);
+
+            int index_matrix = 0;
+            for (int i = 0; i < 3; i++){
+                for (int j = 0; j < 4; j++){
+                    CommandedPose[index_matrix] = NewRobotef(i,j);
+                    index_matrix++;
+                }
+            }
+            Robot->SetCommandedCartPose( CommandedPose );
+            usleep(500000);
+
+            get_current_force(&force);
+
+            force = fabs(force); //- 2.0);
+            if (force > 0.8){
+
+                // It is a valid measure
+                if (count == 0){
+                    indent0 = inc;
+                }
+                indent = fabs(inc) - fabs(indent0);
+
+                stiffness[count] = force / (indent*1000);
+                count++;
+                cout << "Measure " << count << " : " << indent << " - Force (N) : " << force << endl;
+            }
+
+ //           cout << "FORCE: " << force << endl;
+ //           cout << "STIFFNESS: " << stiffness[count-1] << endl << endl;
+        }
+
+        // Average stiffness samples
+        for (int i=1; i<count; i++){
+            stiff += stiffness[i];
+        }
+        stiff /= count;
+
+        // Close flexiforce
+    //    close_loadcell(&bridge);
+
+        // Get starting position
+       Robot->SetCommandedCartPose( MeasuredPose );
+    }
+    else {
+        stiff = 0;
+    }
+
+    return stiff;
+}
+
 
 
 void* packets_loop(void* data){
@@ -397,7 +477,7 @@ void* kuka_thread(void* data){
 
 //        std::cout << "POSE: " << MeasuredPose[3] << "; " << MeasuredPose[7] << "; " << MeasuredPose[11] << std::endl;
 
- //       cout << "FINGER - x: " << finger[0] << ", y: " << finger[1] << ", z: " << finger[2] << endl;
+        cout << "FINGER - x: " << finger[0] << ", y: " << finger[1] << ", z: " << finger[2] << endl;
 //        gotoworld(0, 3) = 0.001 * (-finger[1]);
 //        gotoworld(1, 3) = 0.001 * (-finger[0]);
 //        gotoworld(2, 3) = 0.001 * (finger[2]);
@@ -545,7 +625,7 @@ int phantom_init(int mode, const char* ip_host, double z0_var){
         ZeroPose[10] = -0.504;
         ZeroPose[11] = 0.036;
 */
-/*      POSITION OK     */
+/*      POSITION OK OLD
         ZeroPose[0] = -0.485;
         ZeroPose[1] =  0.45;
         ZeroPose[2] =  0.75;
@@ -558,8 +638,21 @@ int phantom_init(int mode, const char* ip_host, double z0_var){
         ZeroPose[9] =  0.864;
         ZeroPose[10] = -0.503;
         ZeroPose[11] = 0.057;
-
+*/
+        ZeroPose[0] = -0.458;
+        ZeroPose[1] = -0.474;
+        ZeroPose[2] =  0.752;
+        ZeroPose[3] =  0.011;
+        ZeroPose[4] = -0.261;
+        ZeroPose[5] =  0.880;
+        ZeroPose[6] =  0.396;
+        ZeroPose[7] =  0.633;
+        ZeroPose[8] = -0.850;
+        ZeroPose[9] = -0.015;
+        ZeroPose[10] =-0.527;
+        ZeroPose[11] = 0.065;
 /*
+
         // POSITION FOR CORRELATION TESTS
                 ZeroPose[0] = -0.476;
                 ZeroPose[1] =  0.441;
@@ -595,12 +688,19 @@ int phantom_init(int mode, const char* ip_host, double z0_var){
         WorldRobotef = WorldRobotBase*Home;
         WorldRobotefI = WorldRobotef.inverse();
         NewRobotef = Home;
-        std::cout << "Home transformation :"<< Home << std::endl;
+        std::cout << "Home transformation :"<< WorldRobotef << std::endl;
 
         fprintf(stdout, "Performing Cartesian impedance control.\n");
 
         cout << "Getting stiffness information ...";
-        stiffness = 1.0; //get_material_stiffness(); //0.7; //1.0;
+
+        // FLEXIFORCE
+        //stiffness = 1.0; //get_material_stiffness(); //0.7; //1.0;
+
+
+        //LOADCELL
+        stiffness = 0.6; //get_material_stiffness();
+
         cout << "done." << endl;
 
         cout << "STIFFNESS: " << stiffness << endl << endl;

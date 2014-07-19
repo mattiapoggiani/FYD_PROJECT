@@ -29,7 +29,7 @@ static char buffer[5];
 
 bool init_flexiforce();
 void close_flexiforce();
-void get_current_force(double*);
+void get_flexi_force(double*);
 int read_flexiforce();
 
 

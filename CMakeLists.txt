@@ -47,7 +47,7 @@ set(LIBS
         -lopencv_highgui
 )
 
-add_executable(FYD_PROJECT src/wireless_communicator.cpp src/FYD_Client.cpp src/functions.cpp src/conio.cpp src/accelerometers.cpp src/flexiforce.cpp src/main.cpp mainwindow.cpp)
+add_executable(FYD_PROJECT src/wireless_communicator.cpp src/FYD_Client.cpp src/functions.cpp src/conio.cpp src/accelerometers.cpp src/flexiforce.cpp src/loadcell.cpp src/main.cpp mainwindow.cpp)
 
 #add_executable(FYD_PROJECT mainwindow.cpp)
 

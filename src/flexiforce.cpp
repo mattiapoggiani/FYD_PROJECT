@@ -52,7 +52,7 @@ void close_flexiforce(){
         fclose(flexiforce_file);
 }
 
-void get_current_force(double* force){
+void get_flexi_force(double* force){
    read_flexiforce();
    *force = (double)(((FF_SF2*flexiforce_val*flexiforce_val + FF_SF*flexiforce_val + FF_OFF)/1000.0)*ACC_G);  // g --> Newton
 }
